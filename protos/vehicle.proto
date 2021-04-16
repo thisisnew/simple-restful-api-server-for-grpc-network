@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package protos.vehicle;
+
+option go_package = "protos/vehicle";
+
+service Vehicle {
+  rpc GetVehicle(GetVehicleRequest) returns (GetVehicleResponse);
+  rpc ListVehicles(ListVehiclesRequest) returns (ListVehiclesResponse);
+  rpc InsertVehicle(VehicleMessage) returns (StatusMessage);
+  rpc UpdateVehicle(VehicleMessage) returns (StatusMessage);
+  rpc DeleteVehicle(GetVehicleRequest) returns (ListVehiclesResponse);
+}
+
+message VehicleMessage {
+  string vehicle_id = 1;
+  string vehicle_name = 2;
+  string vehicle_number = 3;
+  string vehicle_vin_number = 4;
+  string vehicle_serial_number = 5;
+}
+
+message GetVehicleRequest {
+  string vehicle_id = 1;
+}
+
+message GetVehicleResponse {
+  VehicleMessage vehicle_message = 1;
+}
+
+message ListVehiclesRequest{}
+
+message ListVehiclesResponse {
+  repeated VehicleMessage vehicle_messages = 1;
+}
+
+message StatusMessage {
+  string status = 1;
+  string message = 2;
+}
