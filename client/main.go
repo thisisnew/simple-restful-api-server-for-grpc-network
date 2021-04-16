@@ -44,7 +44,8 @@ func GetVehicleList(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	result, err := c.ListVehicles(ctx, &pb.ListVehiclesRequest{})
+	var result *pb.ListVehiclesResponse
+	result, err = c.ListVehicles(ctx, &pb.ListVehiclesRequest{})
 
 	if err != nil {
 		log.Fatalf("could not request: %v", err)
@@ -69,7 +70,8 @@ func GetVehicle(w http.ResponseWriter, r *http.Request) {
 	p := mux.Vars(r)
 	id := p["id"]
 
-	result, err := c.GetVehicle(ctx, &pb.GetVehicleRequest{VehicleId: id})
+	var result *pb.GetVehicleResponse
+	result, err = c.GetVehicle(ctx, &pb.GetVehicleRequest{VehicleId: id})
 
 	if err != nil {
 		log.Fatalf("could not request: %v", err)
@@ -98,7 +100,8 @@ func InsertVehicle(w http.ResponseWriter, r *http.Request) {
 		log.Panic(err)
 	}
 
-	result, err := c.InsertVehicle(ctx, &pb.VehicleMessage{
+	var result *pb.StatusMessage
+	result, err = c.InsertVehicle(ctx, &pb.VehicleMessage{
 		VehicleId:           newVehicle.VehicleId,
 		VehicleName:         newVehicle.VehicleName,
 		VehicleNumber:       newVehicle.VehicleNumber,
@@ -133,7 +136,8 @@ func UpdateVehicle(w http.ResponseWriter, r *http.Request) {
 		log.Panic(err)
 	}
 
-	result, err := c.UpdateVehicle(ctx, &pb.VehicleMessage{
+	var result *pb.StatusMessage
+	result, err = c.UpdateVehicle(ctx, &pb.VehicleMessage{
 		VehicleId:           newVehicle.VehicleId,
 		VehicleName:         newVehicle.VehicleName,
 		VehicleNumber:       newVehicle.VehicleNumber,
@@ -164,7 +168,8 @@ func DeleteVehicle(w http.ResponseWriter, r *http.Request) {
 	p := mux.Vars(r)
 	id := p["id"]
 
-	result, err := c.DeleteVehicle(ctx, &pb.GetVehicleRequest{VehicleId: id})
+	var result *pb.ListVehiclesResponse
+	result, err = c.DeleteVehicle(ctx, &pb.GetVehicleRequest{VehicleId: id})
 
 	if err != nil {
 		log.Fatalf("could not request: %v", err)
