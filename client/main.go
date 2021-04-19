@@ -24,9 +24,10 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/", GetVehicleList).Methods("GET")
 	router.HandleFunc("/vehicle/{id}", GetVehicle).Methods("GET")
-	router.HandleFunc("/insert", InsertVehicle).Methods("POST")
-	router.HandleFunc("/update", UpdateVehicle).Methods("PATCH")
-	router.HandleFunc("/delete/{id}", DeleteVehicle).Methods("DELETE")
+	router.HandleFunc("/vehicle/insert", InsertVehicle).Methods("POST")
+	router.HandleFunc("/vehicle/update", UpdateVehicle).Methods("PATCH")
+	router.HandleFunc("/vehicle/delete/{id}", DeleteVehicle).Methods("DELETE")
+	router.HandleFunc("/geospatial/insert", InsertGeoDatas).Methods("POST")
 
 	http.ListenAndServe(":8080", httpHandler(router))
 }
@@ -183,4 +184,41 @@ func httpHandler(handler http.Handler) http.Handler {
 		log.Print(r.RemoteAddr, " ", r.Proto, " ", r.Method, " ", r.URL)
 		handler.ServeHTTP(w, r)
 	})
+}
+
+func InsertGeoDatas(w http.ResponseWriter, r *http.Request) {
+
+	var data map[string]string
+	err := json.NewDecoder(r.Body).Decode(&data)
+
+	if err != nil {
+		panic(err)
+	}
+
+	conn, err := grpc.Dial("localhost:9000", grpc.WithInsecure(), grpc.WithBlock())
+
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+
+	defer conn.Close()
+	c := pb.NewVehicleClient(conn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	var result *pb.StatusMessage
+
+	result, err = c.InsertGeoDatas(ctx, &pb.GeoDatas{
+		VehicleId:   data["vehicle_id"],
+		Distance:    data["distance"],
+		XCoordinate: data["x_coordinate"],
+		YCoordinate: data["y_coordinate"],
+	})
+
+	if err != nil {
+		log.Panic(err)
+	}
+
+	json.NewEncoder(w).Encode(result)
 }

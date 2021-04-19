@@ -10,6 +10,7 @@ service Vehicle {
   rpc InsertVehicle(VehicleMessage) returns (StatusMessage);
   rpc UpdateVehicle(VehicleMessage) returns (StatusMessage);
   rpc DeleteVehicle(GetVehicleRequest) returns (ListVehiclesResponse);
+  rpc InsertGeoDatas(GeoDatas) returns (StatusMessage);
 }
 
 message VehicleMessage {
@@ -37,4 +38,11 @@ message ListVehiclesResponse {
 message StatusMessage {
   string status = 1;
   string message = 2;
+}
+
+message GeoDatas {
+  string vehicle_id = 1;
+  string distance = 2;
+  string x_coordinate = 3;
+  string y_coordinate = 4;
 }

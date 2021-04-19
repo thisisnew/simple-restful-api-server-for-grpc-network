@@ -23,6 +23,7 @@ type VehicleClient interface {
 	InsertVehicle(ctx context.Context, in *VehicleMessage, opts ...grpc.CallOption) (*StatusMessage, error)
 	UpdateVehicle(ctx context.Context, in *VehicleMessage, opts ...grpc.CallOption) (*StatusMessage, error)
 	DeleteVehicle(ctx context.Context, in *GetVehicleRequest, opts ...grpc.CallOption) (*ListVehiclesResponse, error)
+	InsertGeoDatas(ctx context.Context, in *GeoDatas, opts ...grpc.CallOption) (*StatusMessage, error)
 }
 
 type vehicleClient struct {
@@ -78,6 +79,15 @@ func (c *vehicleClient) DeleteVehicle(ctx context.Context, in *GetVehicleRequest
 	return out, nil
 }
 
+func (c *vehicleClient) InsertGeoDatas(ctx context.Context, in *GeoDatas, opts ...grpc.CallOption) (*StatusMessage, error) {
+	out := new(StatusMessage)
+	err := c.cc.Invoke(ctx, "/protos.vehicle.Vehicle/InsertGeoDatas", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // VehicleServer is the server API for Vehicle service.
 // All implementations must embed UnimplementedVehicleServer
 // for forward compatibility
@@ -87,6 +97,7 @@ type VehicleServer interface {
 	InsertVehicle(context.Context, *VehicleMessage) (*StatusMessage, error)
 	UpdateVehicle(context.Context, *VehicleMessage) (*StatusMessage, error)
 	DeleteVehicle(context.Context, *GetVehicleRequest) (*ListVehiclesResponse, error)
+	InsertGeoDatas(context.Context, *GeoDatas) (*StatusMessage, error)
 	mustEmbedUnimplementedVehicleServer()
 }
 
@@ -108,6 +119,9 @@ func (UnimplementedVehicleServer) UpdateVehicle(context.Context, *VehicleMessage
 }
 func (UnimplementedVehicleServer) DeleteVehicle(context.Context, *GetVehicleRequest) (*ListVehiclesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteVehicle not implemented")
+}
+func (UnimplementedVehicleServer) InsertGeoDatas(context.Context, *GeoDatas) (*StatusMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InsertGeoDatas not implemented")
 }
 func (UnimplementedVehicleServer) mustEmbedUnimplementedVehicleServer() {}
 
@@ -212,6 +226,24 @@ func _Vehicle_DeleteVehicle_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Vehicle_InsertGeoDatas_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GeoDatas)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VehicleServer).InsertGeoDatas(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/protos.vehicle.Vehicle/InsertGeoDatas",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VehicleServer).InsertGeoDatas(ctx, req.(*GeoDatas))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Vehicle_ServiceDesc is the grpc.ServiceDesc for Vehicle service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -238,6 +270,10 @@ var Vehicle_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteVehicle",
 			Handler:    _Vehicle_DeleteVehicle_Handler,
+		},
+		{
+			MethodName: "InsertGeoDatas",
+			Handler:    _Vehicle_InsertGeoDatas_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
