@@ -207,9 +207,7 @@ func InsertGeoDatas(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	var result *pb.StatusMessage
-
-	result, err = c.InsertGeoDatas(ctx, &pb.GeoDatas{
+	_, err = c.InsertGeoDatas(ctx, &pb.GeoDatas{
 		VehicleId:   data["vehicle_id"],
 		Distance:    data["distance"],
 		XCoordinate: data["x_coordinate"],
@@ -219,6 +217,4 @@ func InsertGeoDatas(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Panic(err)
 	}
-
-	json.NewEncoder(w).Encode(result)
 }
