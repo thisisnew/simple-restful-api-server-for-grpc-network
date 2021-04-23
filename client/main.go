@@ -24,10 +24,10 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/", GetVehicleList).Methods("GET")
 	router.HandleFunc("/vehicle/{id}", GetVehicle).Methods("GET")
-	router.HandleFunc("/vehicle/insert", InsertVehicle).Methods("POST")
-	router.HandleFunc("/vehicle/update", UpdateVehicle).Methods("PATCH")
-	router.HandleFunc("/vehicle/delete/{id}", DeleteVehicle).Methods("DELETE")
-	router.HandleFunc("/geospatial/insert", InsertGeoDatas).Methods("POST")
+	router.HandleFunc("/vehicle", InsertVehicle).Methods("POST")
+	router.HandleFunc("/vehicle/{id}", UpdateVehicle).Methods("PATCH")
+	router.HandleFunc("/vehicle/{id}", DeleteVehicle).Methods("DELETE")
+	router.HandleFunc("/geospatial", InsertGeoDatas).Methods("POST")
 
 	http.ListenAndServe(":8080", httpHandler(router))
 }
@@ -130,6 +130,9 @@ func UpdateVehicle(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
+	p := mux.Vars(r)
+	id := p["id"]
+
 	newVehicle := Vehicle{}
 	err = json.NewDecoder(r.Body).Decode(&newVehicle)
 
@@ -139,7 +142,7 @@ func UpdateVehicle(w http.ResponseWriter, r *http.Request) {
 
 	var result *pb.StatusMessage
 	result, err = c.UpdateVehicle(ctx, &pb.VehicleMessage{
-		VehicleId:           newVehicle.VehicleId,
+		VehicleId:           id,
 		VehicleName:         newVehicle.VehicleName,
 		VehicleNumber:       newVehicle.VehicleNumber,
 		VehicleVinNumber:    newVehicle.VehicleVinNumber,
